@@ -4,10 +4,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
+import re
 
 # Page configuration
 st.set_page_config(
-    page_title="BG Shirke Safety Analytics",
+    page_title="Safety Analytics",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -174,7 +175,7 @@ if selected_status != 'All Status':
     filtered_df = filtered_df[filtered_df['Status'] == selected_status]
 
 # Main Dashboard
-st.markdown("<h1 style='text-align: center; margin-bottom: 30px;'>🛡️ BG Shirke Safety Analytics Dashboard</h1>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='text-align: center; margin-bottom: 30px;'>🛡️ {re.sub(r'[-_]',' ',uploaded_file.name[:-5])} Dashboard</h1>", unsafe_allow_html=True)
 
 # Key Metrics Row
 col1, col2, col3, col4 = st.columns(4)
@@ -256,8 +257,8 @@ if selected_project != 'All Projects':
 
     with col1:
         st.markdown("### 🏗️ Main Area of Observation")
-        area_data = filtered_df['Main Area of Observation'].value_counts().head(10).reset_index()
-        area_data.columns = ['Area', 'Count']
+        area_data = filtered_df.groupby(['Main Area of Observation','Risk Level']).size().reset_index()
+        area_data.columns = ['Area', 'Risk Level','Count']
         
         fig3 = px.bar(
             area_data,
@@ -265,7 +266,8 @@ if selected_project != 'All Projects':
             y='Area',
             orientation='h',
             template='plotly_dark',
-            color='Count',
+            color='Risk Level',
+            color_discrete_map={'High': '#FF6B6B', 'Medium': '#FFB84D', 'Low': '#4ECB71'},
             color_continuous_scale='Sunset'
         )
         fig3.update_layout(
