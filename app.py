@@ -386,7 +386,10 @@ if has_valid_categories(filtered_df):
     
     if len(valid_categories) > 0:
         # Split and count categories
-        category_data = valid_categories['Category'].str.split(',').explode()
+        if ',' in valid_categories['Category'].values:
+            category_data = valid_categories['Category'].str.split(',').explode()
+        else:
+            category_data = valid_categories['Category'].str.split(';').explode()
         category_data = category_data.str.strip()
         category_data = category_data[category_data.apply(is_valid_category)]
         category_data = category_data.value_counts().reset_index()
